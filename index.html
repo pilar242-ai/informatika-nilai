@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Cek Tugas Perbaikan</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  input, button { padding: 10px; margin: 5px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  th { background-color: #f4f4f4; }
+</style>
+</head>
+<body>
+
+<h2>Cek Tugas Perbaikan</h2>
+<p>Masukkan Nama dan Kelas (misalnya: Amelia, X TKJ)</p>
+
+<input type="text" id="nama" placeholder="Nama Siswa">
+<input type="text" id="kelas" placeholder="Kelas (contoh: X TKJ)">
+<button onclick="cekData()">Cari</button>
+
+<div id="hasil"></div>
+
+<script>
+function cekData() {
+    const nama = document.getElementById("nama").value.trim();
+    const kelas = document.getElementById("kelas").value.trim();
+
+    if (!nama || !kelas) {
+        document.getElementById("hasil").innerHTML = "<p style='color:red'>Masukkan nama dan kelas.</p>";
+        return;
+    }
+
+    const url = `https://script.google.com/macros/s/AKfycbzuwf1pfQ5gw8nDfwzgEvlYII9yCSbSZlF9b91Im1wCCXdP6Q_j0nqsHlZjAuL8opuOXQ/exec?nama=${encodeURIComponent(nama)}&kelas=${encodeURIComponent(kelas)}`;
+
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        console.log("Data dari API:", data);
+
+        if (!data || data.length === 0) {
+            document.getElementById("hasil").innerHTML = "<p style='color:orange'>Data tidak ditemukan.</p>";
+            return;
+        }
+
+        let table = `<table>
+                      <tr>
+                        <th>Nama</th>
+                        <th>Kelas</th>
+                        <th>Tugas</th>
+                        <th>Status</th>
+                        <th>Link Perbaikan</th>
+                      </tr>`;
+
+        data.forEach(item => {
+            table += `<tr>
+                        <td>${item.nama}</td>
+                        <td>${item.kelas}</td>
+                        <td>${item.tugas}</td>
+                        <td>${item.status}</td>
+                        <td><a href="${item.link_perbaikan}" target="_blank">Isi Form</a></td>
+                      </tr>`;
+        });
+
+        table += `</table>`;
+        document.getElementById("hasil").innerHTML = table;
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("hasil").innerHTML = "<p style='color:red'>Gagal mengambil data.</p>";
+    });
+}
+
+</script>
+
+</body>
+</html>
